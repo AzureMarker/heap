@@ -1,39 +1,18 @@
-use std::cmp::max;
-
-fn main() {
-    let mut heap = Heap::new();
-    println!("{:?}", heap);
-
-    heap.push(1);
-    println!("{:?}", heap);
-    heap.push(2);
-    println!("{:?}", heap);
-    heap.push(3);
-    println!("{:?}", heap);
-
-    println!("{:?}", heap.pop());
-    println!("{:?}", heap);
-    println!("{:?}", heap.pop());
-    println!("{:?}", heap);
-    println!("{:?}", heap.pop());
-    println!("{:?}", heap);
-}
-
 #[derive(Debug)]
-struct Heap {
+pub struct Heap {
     list: Vec<i32>
 }
 
 impl Heap {
-    fn new() -> Heap {
+    pub fn new() -> Heap {
         Heap { list: vec![] }
     }
 
-    fn peek(&self) -> Option<i32> {
+    pub fn peek(&self) -> Option<i32> {
         if self.list.len() != 0 { Some(self.list[0]) } else { None }
     }
 
-    fn push(&mut self, value: i32) {
+    pub fn push(&mut self, value: i32) {
         self.list.push(value);
         let mut index = self.list.len() - 1;
 
@@ -45,7 +24,7 @@ impl Heap {
         }
     }
 
-    fn pop(&mut self) -> Option<i32> {
+    pub fn pop(&mut self) -> Option<i32> {
         let result = match self.peek() {
             Some(elem) => elem,
             None => return None
@@ -100,5 +79,54 @@ impl Heap {
 
     fn right(&self, index: usize) -> usize {
         self.left(index) + 1
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Heap;
+
+    #[test]
+    fn empty_returns_none() {
+        let mut heap = Heap::new();
+
+        assert_eq!(heap.peek(), None);
+        assert_eq!(heap.pop(), None);
+    }
+
+    #[test]
+    fn add_simple() {
+        let mut heap = Heap::new();
+
+        heap.push(1);
+        heap.push(2);
+        heap.push(3);
+
+        assert_eq!(heap.list, vec![3, 1, 2]);
+    }
+
+    #[test]
+    fn pop_simple() {
+        let mut heap = Heap::new();
+
+        heap.push(1);
+        heap.push(2);
+        heap.push(3);
+
+        let pop1 = heap.pop();
+        assert_eq!(pop1, Some(3));
+        assert_eq!(heap.list, vec![2, 1]);
+
+        let pop2 = heap.pop();
+        assert_eq!(pop2, Some(2));
+        assert_eq!(heap.list, vec![1]);
+
+        let pop3 = heap.pop();
+        assert_eq!(pop3, Some(1));
+        assert_eq!(heap.list, vec![]);
+
+        let pop4 = heap.pop();
+        assert_eq!(pop4, None);
+        assert_eq!(heap.list, vec![]);
     }
 }
