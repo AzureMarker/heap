@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub struct Heap {
-    list: Vec<i32>
+    list: Vec<i32>,
 }
 
 impl Heap {
@@ -9,7 +9,11 @@ impl Heap {
     }
 
     pub fn peek(&self) -> Option<i32> {
-        if self.list.len() != 0 { Some(self.list[0]) } else { None }
+        if self.list.len() != 0 {
+            Some(self.list[0])
+        } else {
+            None
+        }
     }
 
     pub fn push(&mut self, value: i32) {
@@ -27,13 +31,12 @@ impl Heap {
     pub fn pop(&mut self) -> Option<i32> {
         let result = match self.peek() {
             Some(elem) => elem,
-            None => return None
+            None => return None,
         };
 
         if self.list.len() > 1 {
             self.list[0] = self.list.pop().unwrap();
-        }
-        else {
+        } else {
             self.list.remove(0);
         }
 
