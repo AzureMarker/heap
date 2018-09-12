@@ -5,43 +5,55 @@ pub struct Heap {
 
 impl Heap {
     pub fn new() -> Heap {
-        Heap { list: vec![] }
+        Heap { list: Vec::new() }
     }
 
+    /// Get the maximum value in the heap or `None` if the heap is empty.
     pub fn peek(&self) -> Option<i32> {
-        if self.list.len() != 0 {
-            Some(self.list[0])
-        } else {
-            None
-        }
+        self.list.get(0).map(Clone::clone)
     }
 
+    /// Add a value to the heap.
     pub fn push(&mut self, value: i32) {
         self.list.push(value);
-        let mut index = self.list.len() - 1;
-
-        while !self.is_valid(index) {
-            let parent = self.parent(index);
-            self.list[index] = self.list[parent];
-            self.list[parent] = value;
-            index = parent;
-        }
+        let index = self.list.len() - 1;
+        self.heapify_up(index)
     }
 
+    /// Remove the maximum value in the heap or `None` if the heap is empty.
     pub fn pop(&mut self) -> Option<i32> {
+        // Get the maximum value
         let result = match self.peek() {
             Some(elem) => elem,
             None => return None,
         };
 
+        // Move the last element to the front.
+        // If there is only one element, the list is now empty.
         if self.list.len() > 1 {
             self.list[0] = self.list.pop().unwrap();
         } else {
             self.list.remove(0);
         }
 
-        let mut index = 0;
+        self.heapify_down(0);
 
+        Some(result)
+    }
+
+    /// Reorganize the heap upwards to make it valid again.
+    /// The index parameter is where to start the heapify operation.
+    fn heapify_up(&mut self, mut index: usize) {
+        while !self.is_valid(index) {
+            let parent = self.parent(index);
+            self.list.swap(index, parent);
+            index = parent;
+        }
+    }
+
+    /// Reorganize the heap downwards to make it valid again.
+    /// The index parameter is where to start the heapify operation.
+    fn heapify_down(&mut self, mut index: usize) {
         loop {
             let (left_index, right_index) = (self.left(index), self.right(index));
             let mut largest = index;
@@ -64,22 +76,24 @@ impl Heap {
             self.list.swap(index, largest);
             index = largest;
         }
-
-        Some(result)
     }
 
+    /// Check if the entry is valid (compares with parent)
     fn is_valid(&self, index: usize) -> bool {
         index == 0 || self.list[self.parent(index)] >= self.list[index]
     }
 
+    /// Get the parent index of the entry at the index
     fn parent(&self, index: usize) -> usize {
         (index - 1) / 2 as usize
     }
 
+    /// Get the left child index of the entry at the index
     fn left(&self, index: usize) -> usize {
         index * 2 + 1
     }
 
+    /// Get the right child index of the entry at the index
     fn right(&self, index: usize) -> usize {
         self.left(index) + 1
     }
