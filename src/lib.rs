@@ -1,39 +1,39 @@
 #[derive(Debug)]
-pub struct Heap {
-    list: Vec<i32>,
+pub struct Heap<T: PartialOrd> {
+    list: Vec<T>,
 }
 
-impl Heap {
-    pub fn new() -> Heap {
+impl<T: PartialOrd> Heap<T> {
+    pub fn new() -> Heap<T> {
         Heap { list: Vec::new() }
     }
 
     /// Get the maximum value in the heap or `None` if the heap is empty.
-    pub fn peek(&self) -> Option<i32> {
-        self.list.get(0).map(Clone::clone)
+    pub fn peek(&self) -> Option<&T> {
+        self.list.get(0)
     }
 
     /// Add a value to the heap.
-    pub fn push(&mut self, value: i32) {
+    pub fn push(&mut self, value: T) {
         self.list.push(value);
         let index = self.list.len() - 1;
         self.heapify_up(index)
     }
 
     /// Remove the maximum value in the heap or `None` if the heap is empty.
-    pub fn pop(&mut self) -> Option<i32> {
+    pub fn pop(&mut self) -> Option<T> {
+        if self.list.len() == 0 {
+            return None;
+        }
+
         // Get the maximum value
-        let result = match self.peek() {
-            Some(elem) => elem,
-            None => return None,
-        };
+        let result = self.list.remove(0);
 
         // Move the last element to the front.
         // If there is only one element, the list is now empty.
-        if self.list.len() > 1 {
-            self.list[0] = self.list.pop().unwrap();
-        } else {
-            self.list.remove(0);
+        if self.list.len() > 0 {
+            let last = self.list.pop().unwrap();
+            self.list.insert(0, last);
         }
 
         self.heapify_down(0);
@@ -105,7 +105,7 @@ mod tests {
 
     #[test]
     fn empty_returns_none() {
-        let mut heap = Heap::new();
+        let mut heap: Heap<()> = Heap::new();
 
         assert_eq!(heap.peek(), None);
         assert_eq!(heap.pop(), None);
